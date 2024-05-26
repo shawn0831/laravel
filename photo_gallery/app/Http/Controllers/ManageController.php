@@ -13,10 +13,9 @@ class ManageController extends Controller
     {
         $this->middleware('auth');
 
-        $this->photo_path = 'storage\\\image\\\photo\\';
         // storage
-        $this->storage_photo_path = 'image\\\photo\\\\';
-        $this->storage_tmp_photo_path = 'image\\\tmp_photo\\\\';
+        $this->photo_path = 'image\\\photo\\\\';
+        $this->tmp_photo_path = 'image\\\tmp_photo\\\\';
         // echo $this->photo_path;
         // echo "<br>";
     }
@@ -45,19 +44,15 @@ class ManageController extends Controller
             $file_size = $file->getSize();
             
             // storage
-            $storage_path = $file->storeAs($this->storage_tmp_photo_path,$file_name);
-            $file_path = 'storage\\\\'.$storage_path;
-
-            // 手動複製檔案
-            // copy(storage_path('app/public/image/tmp_photo/'.$file_name), public_path('storage/image/tmp_photo/'.$file_name));
+            $tmp_file = $file->storeAs($this->tmp_photo_path, $file_name);
             
             return ['photo'=>'upload_photo preview success!',
                 'valid'=>$valid,
                 'file_name'=>$file_name,
                 'file_extension'=>$file_extension,
-                'file_path'=>$file_path,
+                'file_path'=>$tmp_file,
                 'file_size'=>$file_size,
-                'public_path'=>public_path('storage/image/tmp_photo/'.$file_name),
+                'public_path'=>$tmp_file,
             ];
         }else{
             return ['photo'=>'upload_photo preview failed!'];
@@ -65,12 +60,13 @@ class ManageController extends Controller
     }
     public function release_photo(Request $request, photo $photo){
         $user = $request->user();
+        $user_id = $user->id;
         $user_name = $user->name;
 
         $tmp_photo_name = $request->tmp_photo_name;
 
-        $tmp_path = $this->storage_tmp_photo_path.$tmp_photo_name;
-        $path = $this->storage_photo_path.$tmp_photo_name;
+        $tmp_path = $this->tmp_photo_path . $tmp_photo_name;
+        $path = $this->photo_path . $tmp_photo_name;
 
         // 建立photo
         $this->validate($request,[
@@ -81,7 +77,7 @@ class ManageController extends Controller
 
         // 移動暫存檔
         Storage::move($tmp_path, $path);
-        Storage::deleteDirectory($this->storage_tmp_photo_path);
+        Storage::deleteDirectory($this->tmp_photo_path);
 
         // 手動移動暫存檔
         // rename(public_path('storage/image/tmp_photo/'.$tmp_photo_name), public_path('storage/image/photo/'.$tmp_photo_name));
@@ -90,7 +86,8 @@ class ManageController extends Controller
             'photo_name'=>$request->write_photo_name,
             'file_name'=>$request->tmp_photo_name,
             'introduction'=>$request->write_introduction,
-            'creater'=>$user_name,
+            'creater'=>$user_id,
+            'updater'=>$user_id,
         ]);
 
         return ['photo'=>'release photo success!',
@@ -122,7 +119,7 @@ class ManageController extends Controller
         $this->authorize('photo_authorize', $photo);
         $photo->delete();
 
-        $delete_path = $this->storage_photo_path.$file_name;
+        $delete_path = $this->photo_path . $file_name;
         Storage::delete($delete_path);
 
         // 手動刪除相片
@@ -139,8 +136,7 @@ class ManageController extends Controller
             $file_size = $file->getSize();
 
             // storage
-            $storage_path = $file->storeAs($this->storage_tmp_photo_path,$file_name);
-            $file_path = 'storage\\\\'.$storage_path;
+            $tmp_file = $file->storeAs($this->tmp_photo_path,$file_name);
 
             // 手動複製檔案
             // copy(storage_path('app/public/image/tmp_photo/'.$file_name), public_path('storage/image/tmp_photo/'.$file_name));
@@ -149,7 +145,7 @@ class ManageController extends Controller
                 'valid'=>$valid,
                 'file_name'=>$file_name,
                 'file_extension'=>$file_extension,
-                'file_path'=>$file_path,
+                'file_path'=>$tmp_file,
                 'file_size'=>$file_size,
             ];
         }else{
@@ -158,16 +154,17 @@ class ManageController extends Controller
     }
     public function update_photo_submit(Request $request, photo $photo){
         $user = $request->user();
+        $user_id = $user->id;
         $user_name = $user->name;
 
         $tmp_photo_name = $request->tmp_photo_name;
         $photo_name = $request->photo_name;
 
-        $tmp_path = $this->storage_tmp_photo_path.$tmp_photo_name;
-        $path = $this->storage_photo_path.$tmp_photo_name;
-        $delete_path = $this->storage_photo_path.$photo_name;
+        $tmp_path = $this->tmp_photo_path.$tmp_photo_name;
+        $path = $this->photo_path.$tmp_photo_name;
+        $delete_path = $this->photo_path.$photo_name;
 
-        // 更改Photo檔案名稱
+        // 更改 Photo 檔案名稱
         $this->authorize('photo_authorize', $photo);
         
         $this->validate($request,[
@@ -177,7 +174,7 @@ class ManageController extends Controller
         // 移動暫存檔
         Storage::move($tmp_path, $path);
         Storage::delete($delete_path);
-        Storage::deleteDirectory($this->storage_tmp_photo_path);
+        Storage::deleteDirectory($this->tmp_photo_path);
 
         // 手動移動暫存檔
         // rename(public_path('storage/image/tmp_photo/'.$tmp_photo_name), public_path('storage/image/photo/'.$tmp_photo_name));
@@ -196,6 +193,7 @@ class ManageController extends Controller
     }
     public function update_introduction(Request $request, Photo $photo){
         $user = $request->user();
+        $user_id = $user->id;
         $user_name = $user->name;
 
         $this->authorize('photo_authorize', $photo);
@@ -209,7 +207,7 @@ class ManageController extends Controller
         $photo->update([
             'photo_name'=>$request->update_photo_name,
             'introduction'=>$request->update_introduction,
-            'updater'=>$user_name,
+            'updater'=>$user_id,
         ]);
 
         return ['photo'=>'update introduction success!'];

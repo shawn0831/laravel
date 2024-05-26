@@ -67,7 +67,7 @@
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
-                <a class="navbar-brand" href="{{ url('/main_page') }}">
+                <a class="navbar-brand" href="{{ url('/all_photo') }}">
                     <!-- {{ config('app.name', 'Laravel') }} -->
                     Photo Gallery
                 </a>
@@ -102,9 +102,9 @@
 
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                                     <!-- photo_gallery -->
-                                    <a class="dropdown-item" href="{{ route('main_page') }}">
+                                    <!-- <a class="dropdown-item" href="{{ route('main_page') }}">
                                         動態牆
-                                    </a>
+                                    </a> -->
                                     <a class="dropdown-item" href="{{ route('all_photo') }}">
                                         我的相片
                                     </a>

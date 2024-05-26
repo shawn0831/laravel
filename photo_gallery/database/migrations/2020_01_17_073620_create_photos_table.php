@@ -18,11 +18,11 @@ class CreatePhotosTable extends Migration
             $table->integer('user_id')->index();
             $table->string('photo_name');
             $table->string('file_name');
-            $table->integer('sort');
-            $table->string('class');
+            $table->integer('sort')->default(0);
+            $table->string('class')->nullable();
             $table->string('introduction');
-            $table->string('creater');
-            $table->string('updater');
+            $table->integer('creater')->default(0);
+            $table->integer('updater')->default(0);
             $table->timestamps();
         });
     }

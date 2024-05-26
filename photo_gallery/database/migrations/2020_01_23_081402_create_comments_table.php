@@ -18,8 +18,8 @@ class CreateCommentsTable extends Migration
             $table->integer('user_id')->index();
             $table->integer('photo_id')->index();
             $table->string('comment');
-            $table->string('creater');
-            $table->string('updater');
+            $table->integer('creater')->default(0);
+            $table->integer('updater')->default(0);
             $table->timestamps();
         });
     }

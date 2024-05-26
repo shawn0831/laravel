@@ -15,7 +15,7 @@ class PhotoController extends Controller
     {
         $this->middleware('auth');
 
-        $this->photo_path = 'storage\\\image\\\photo\\';
+        $this->photo_path = 'image\\\photo\\';
         // echo $this->photo_path;
         // echo "<br>";
     }
@@ -43,7 +43,11 @@ class PhotoController extends Controller
     public function comment(Request $request, Photo $photo, Comment $comment){
         $photo_id = $photo->id;
     
-        $all_comment = $comment->where('photo_id', $photo_id)->orderBy('created_at','desc')->get();
+        $all_comment = $comment->select('comments.*', 'users.name')
+            ->leftJoin('users', 'comments.user_id', '=', 'users.id')
+            ->where('photo_id', $photo_id)
+            ->orderBy('comments.created_at','desc')
+            ->get();
         $comment_num = $all_comment->count();
         $data = [$all_comment,$comment_num];
         return $data;
@@ -63,20 +67,26 @@ class PhotoController extends Controller
             'user_id'=>$user_id,
             'photo_id'=>$photo_id,
             'comment'=>$request->comment,
-            'creater'=>$user_name,
+            'creater'=>$user_id,
+            'updater'=>$user_id,
         ]);
 
         return ['comment'=>'create success!'];
     }
     function delete_comment(Request $request, Comment $comment){
+        $user = $request->user();
+        $user_id = $user->id;
 
         $this->authorize('comment_authorize', $comment);
-        $comment->delete();
+        $comment->delete([
+            'updater'=>$user_id,
+        ]);
 
         return ['comment'=>'delete success!'];
     }
     function update_comment(Request $request, Comment $comment){
         $user = $request->user();
+        $user_id = $user->id;
         $user_name = $user->name;
 
         $this->authorize('comment_authorize', $comment);
@@ -88,7 +98,7 @@ class PhotoController extends Controller
 
         $comment->update([
             'comment'=>$request->comment_update,
-            'updater'=>$user_name,
+            'updater'=>$user_id,
         ]);
 
         return ['comment'=>'update success!'];

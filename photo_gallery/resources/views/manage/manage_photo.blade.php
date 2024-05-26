@@ -158,7 +158,7 @@
     .photo_column .photo_delete{
         background:#000;
         opacity:0.6;
-        visibility:hidden;
+        /* visibility:hidden; */
 
         padding:0px 10px 5px 10px;
 
@@ -530,7 +530,7 @@
             url:'/manage_photo/all_photo',
             dataType:'json',
             success:function(result){
-                console.log(result);
+                console.log('result: ', result);
 
                 $all_photo = result[0];
                 $photo_num = result[1];
@@ -542,14 +542,14 @@
                     $.each($all_photo,function(){
                         $('.photo_manage').append(
                             '<div class="photo_column" photo_id='+$all_photo[$i]['id']+'>'+
-                                '<div class="photo_img" style="background:url('+$photo_path+'\\'+$all_photo[$i]['file_name']+') no-repeat center center;background-size:cover;"></div>'+
+                                '<div class="photo_img" style="background:url(' + $photo_path + '' + $all_photo[$i]['file_name'] + ') no-repeat center center;background-size:cover;"></div>'+
                                 '<div class="photo_name">'+$all_photo[$i]['photo_name']+'</div>'+
                                 '<div class="photo_time">'+$all_photo[$i]['created_at']+'</div>'+
 
                                 '<div class="photo_delete">x</div>'+
                             '</div>'
                         );
-                        // console.log($all_photo[$i]);
+                        console.log('$i: ', $all_photo[$i]);
                         $i++;
                     });
                 }else{
@@ -568,7 +568,7 @@
             success:function(result){
                 console.log(result);
 
-                $('.light-box-photo_img').css({'background':'url('+$photo_path+'\\'+result['file_name']+') center center no-repeat','background-size':'contain'});
+                $('.light-box-photo_img').css({'background':'url(' + $photo_path + '' + result['file_name']+') center center no-repeat','background-size':'contain'});
                 $('.light-box-photo_img').attr('photo_name',result['file_name']);
                 $('.light-box-photo_name').children('span').html(' '+result['photo_name']);
                 $('.light-box-photo_time').children('span').html(' '+result['created_at']);

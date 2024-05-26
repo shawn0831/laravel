@@ -347,7 +347,7 @@
                                     '<div class="comment_content">'+$all_comment[$i]['comment']+'</div>'+
 
                                     '<div class="comment_row_control" comment_id="'+$all_comment[$i]['id']+'">'+
-                                        '<span class="comment_data">'+$all_comment[$i]['creater']+' '+$all_comment[$i]['created_at']+'</span>'+
+                                        '<span class="comment_data">'+$all_comment[$i]['name']+' '+$all_comment[$i]['created_at']+'</span>'+
                                         '<span class="update_comment">修改</span>'+
                                         '<span class="delete_comment">刪除</span>'+
                                     '</div>'+
@@ -388,7 +388,7 @@
 
         $.ajax({
             type:'post',
-            url:'/all_photo/comment/'+$photo_id+'/write',
+            url:'/all_photo/comment/' + $photo_id + '/write',
             dataType:'json',
             data:{'photo_id':$photo_id,'comment':$comment},
             success:function(result){
